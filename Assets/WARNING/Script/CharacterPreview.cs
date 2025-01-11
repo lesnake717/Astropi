@@ -11,7 +11,6 @@ public class CharacterPreviewManager : MonoBehaviour
     {
         public Image characterImage;
         public GameObject characterPrefab;
-        public string price;
         public TextMeshProUGUI priceText;
     }
 
@@ -22,11 +21,17 @@ public class CharacterPreviewManager : MonoBehaviour
 
     private GameObject currentDisplayedCharacter;
     private TextMeshProUGUI currentDisplayedPrice;
+    private bool isDefaultCharacter = true;
 
     void Start()
     {
         SetupEventTriggers();
-        HideAllPrices(); // Cache tous les prix au démarrage
+        HideAllPrices();
+
+        if (characters.Count > 0)
+        {
+            DisplayDefaultCharacter(characters[0]);
+        }
     }
 
     void HideAllPrices()
@@ -35,54 +40,73 @@ public class CharacterPreviewManager : MonoBehaviour
         {
             if (character.priceText != null)
             {
-                character.priceText.text = character.price;
                 character.priceText.color = priceColor;
-                character.priceText.gameObject.SetActive(false); // Cache le texte
+                character.priceText.gameObject.SetActive(false);
             }
         }
     }
 
     void SetupEventTriggers()
     {
-        foreach (var character in characters)
+        for (int i = 0; i < characters.Count; i++)
         {
+            var character = characters[i];
+            var characterIndex = i; // Capture l'index pour l'utiliser dans les callbacks
+
             EventTrigger trigger = character.characterImage.gameObject.GetComponent<EventTrigger>();
             if (trigger == null)
                 trigger = character.characterImage.gameObject.AddComponent<EventTrigger>();
 
-            // Configuration du hover (PointerEnter)
-            EventTrigger.Entry entryEnter = new EventTrigger.Entry();
-            entryEnter.eventID = EventTriggerType.PointerEnter;
-            entryEnter.callback.AddListener((data) => {
-                DisplayCharacterAndPrice(character);
-            });
-            trigger.triggers.Add(entryEnter);
+            if (characterIndex == 0) // Pour le personnage par défaut (Element 0)
+            {
+                EventTrigger.Entry entryEnter = new EventTrigger.Entry();
+                entryEnter.eventID = EventTriggerType.PointerEnter;
+                entryEnter.callback.AddListener((data) => {
+                    if (!isDefaultCharacter)
+                    {
+                        DisplayDefaultCharacter(character);
+                    }
+                    ShowPrice(character.priceText);
+                });
+                trigger.triggers.Add(entryEnter);
 
-            // Configuration du hover exit (PointerExit)
-            EventTrigger.Entry entryExit = new EventTrigger.Entry();
-            entryExit.eventID = EventTriggerType.PointerExit;
-            entryExit.callback.AddListener((data) => {
-                // Ne cache le prix que si aucun personnage n'est actuellement sélectionné par clic
-                if (currentDisplayedPrice != character.priceText)
-                {
+                EventTrigger.Entry entryExit = new EventTrigger.Entry();
+                entryExit.eventID = EventTriggerType.PointerExit;
+                entryExit.callback.AddListener((data) => {
                     HidePrice(character.priceText);
-                }
-            });
-            trigger.triggers.Add(entryExit);
+                });
+                trigger.triggers.Add(entryExit);
+            }
+            else // Pour les autres personnages
+            {
+                EventTrigger.Entry entryEnter = new EventTrigger.Entry();
+                entryEnter.eventID = EventTriggerType.PointerEnter;
+                entryEnter.callback.AddListener((data) => {
+                    isDefaultCharacter = false;
+                    DisplayCharacterAndPrice(character);
+                });
+                trigger.triggers.Add(entryEnter);
 
-            // Configuration du click
-            EventTrigger.Entry entryClick = new EventTrigger.Entry();
-            entryClick.eventID = EventTriggerType.PointerClick;
-            entryClick.callback.AddListener((data) => {
-                DisplayCharacterAndPrice(character);
-            });
-            trigger.triggers.Add(entryClick);
+                EventTrigger.Entry entryExit = new EventTrigger.Entry();
+                entryExit.eventID = EventTriggerType.PointerExit;
+                entryExit.callback.AddListener((data) => {
+                    HidePrice(character.priceText);
+                });
+                trigger.triggers.Add(entryExit);
+
+                EventTrigger.Entry entryClick = new EventTrigger.Entry();
+                entryClick.eventID = EventTriggerType.PointerClick;
+                entryClick.callback.AddListener((data) => {
+                    isDefaultCharacter = false;
+                    DisplayCharacterAndPrice(character);
+                });
+                trigger.triggers.Add(entryClick);
+            }
         }
     }
 
-    void DisplayCharacterAndPrice(CharacterData character)
+    void DisplayDefaultCharacter(CharacterData character)
     {
-        // Gérer l'affichage du personnage
         if (currentDisplayedCharacter != null)
         {
             Destroy(currentDisplayedCharacter);
@@ -92,14 +116,46 @@ public class CharacterPreviewManager : MonoBehaviour
         currentDisplayedCharacter = Instantiate(character.characterPrefab, worldSpawnPosition, Quaternion.Euler(characterRotation));
         currentDisplayedCharacter.transform.SetParent(transform);
 
-        // Gérer l'animation si elle existe
+        if (currentDisplayedPrice != null)
+        {
+            currentDisplayedPrice.gameObject.SetActive(false);
+            currentDisplayedPrice = null;
+        }
+
         Animator animator = currentDisplayedCharacter.GetComponent<Animator>();
         if (animator != null)
         {
             animator.Play("Idle");
         }
 
-        // Gérer l'affichage du prix
+        isDefaultCharacter = true;
+    }
+
+    void ShowPrice(TextMeshProUGUI priceText)
+    {
+        if (currentDisplayedPrice != null && currentDisplayedPrice != priceText)
+        {
+            currentDisplayedPrice.gameObject.SetActive(false);
+        }
+
+        if (priceText != null)
+        {
+            priceText.gameObject.SetActive(true);
+            currentDisplayedPrice = priceText;
+        }
+    }
+
+    void DisplayCharacterAndPrice(CharacterData character)
+    {
+        if (currentDisplayedCharacter != null)
+        {
+            Destroy(currentDisplayedCharacter);
+        }
+
+        Vector3 worldSpawnPosition = transform.position + characterSpawnPosition;
+        currentDisplayedCharacter = Instantiate(character.characterPrefab, worldSpawnPosition, Quaternion.Euler(characterRotation));
+        currentDisplayedCharacter.transform.SetParent(transform);
+
         if (currentDisplayedPrice != null)
         {
             currentDisplayedPrice.gameObject.SetActive(false);
@@ -110,6 +166,12 @@ public class CharacterPreviewManager : MonoBehaviour
             character.priceText.gameObject.SetActive(true);
             currentDisplayedPrice = character.priceText;
         }
+
+        Animator animator = currentDisplayedCharacter.GetComponent<Animator>();
+        if (animator != null)
+        {
+            animator.Play("Idle");
+        }
     }
 
     void HidePrice(TextMeshProUGUI priceText)
@@ -117,6 +179,10 @@ public class CharacterPreviewManager : MonoBehaviour
         if (priceText != null)
         {
             priceText.gameObject.SetActive(false);
+            if (currentDisplayedPrice == priceText)
+            {
+                currentDisplayedPrice = null;
+            }
         }
     }
 

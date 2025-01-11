@@ -6,6 +6,7 @@ public class GestionJeu : MonoBehaviour
     public GameObject personnageParDefaut;
     public Avatar MasculineAvatar; // Référence à l'avatar à utiliser
 
+
     private GameObject instancePersonnage;
     private GameObject objetParent;
     private Animator animatorPersonnage;
