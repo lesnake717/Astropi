@@ -116,10 +116,16 @@ public class CharacterPreviewManager : MonoBehaviour
         currentDisplayedCharacter = Instantiate(character.characterPrefab, worldSpawnPosition, Quaternion.Euler(characterRotation));
         currentDisplayedCharacter.transform.SetParent(transform);
 
+        // Gestion de l'affichage du prix
         if (currentDisplayedPrice != null)
         {
             currentDisplayedPrice.gameObject.SetActive(false);
-            currentDisplayedPrice = null;
+        }
+
+        if (character.priceText != null)
+        {
+            character.priceText.gameObject.SetActive(true);
+            currentDisplayedPrice = character.priceText;
         }
 
         Animator animator = currentDisplayedCharacter.GetComponent<Animator>();
@@ -176,6 +182,13 @@ public class CharacterPreviewManager : MonoBehaviour
 
     void HidePrice(TextMeshProUGUI priceText)
     {
+        // Ne masque pas le prix si un prefab est toujours affiché
+        if (currentDisplayedCharacter != null)
+        {
+            return; // Prix reste affiché
+        }
+
+        // Sinon, masque le prix comme d'habitude
         if (priceText != null)
         {
             priceText.gameObject.SetActive(false);
