@@ -2,91 +2,126 @@ using UnityEngine;
 
 public class GestionJeu : MonoBehaviour
 {
-    public GameObject[] prefabsPersonnages;
-    public GameObject personnageParDefaut;
-    public Avatar MasculineAvatar; // Référence à l'avatar à utiliser
-
+    public GameObject[] prefabsPersonnages; // Tableau des préfabriqués de personnages
+    public GameObject personnageParDefaut; // Personnage par défaut
+    public Avatar MasculineAvatar; // Avatar pour les personnages masculins
+    public Avatar FeminineAvatar;  // Avatar pour les personnages féminins
+    public Avatar DefaultAvatar;   // Avatar par défaut (optionnel)
 
     private GameObject instancePersonnage;
-    private GameObject objetParent;
-    private Animator animatorPersonnage;
+    private GameObject objetParent; // GameObject "3"
+    private Animator animatorParent; // Animator du GameObject "3"
 
     private void Start()
     {
+        // Récupérer l'index du personnage sélectionné
         int indexChoisi = PlayerPrefs.GetInt("PersonnageChoisiIndex", -1);
         Debug.Log("Index du personnage sélectionné récupéré depuis PlayerPrefs : " + indexChoisi);
 
+        // Trouver le GameObject "3" dans la scène
         objetParent = GameObject.Find("3");
 
         if (objetParent != null)
         {
-            Transform personnageParDefautTransform = objetParent.transform.Find("Personnage_1");
-            if (personnageParDefautTransform != null)
-            {
-                DestroyImmediate(personnageParDefautTransform.gameObject);
-            }
+            Debug.Log("GameObject '3' trouvé dans la scène.");
 
-            if (indexChoisi >= 0 && indexChoisi < prefabsPersonnages.Length)
-            {
-                GameObject prefabPersonnageChoisi = prefabsPersonnages[indexChoisi];
-                instancePersonnage = Instantiate(prefabPersonnageChoisi, objetParent.transform);
-                instancePersonnage.transform.parent = objetParent.transform;
-                animatorPersonnage = instancePersonnage.GetComponent<Animator>();
+            // Récupérer l'Animator du GameObject "3"
+            animatorParent = objetParent.GetComponent<Animator>();
 
-                if (animatorPersonnage != null)
+            if (animatorParent != null)
+            {
+                Debug.Log("Animator trouvé sur le GameObject '3'.");
+
+                // Supprimer le personnage par défaut existant
+                Transform personnageParDefautTransform = objetParent.transform.Find("Personnage_1");
+                if (personnageParDefautTransform != null)
                 {
-                    // Attribuer le nouveau contrôleur d'animation vide
-                    animatorPersonnage.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("NomDuControlleurVide");
+                    DestroyImmediate(personnageParDefautTransform.gameObject);
+                }
 
-                    // Changer l'avatar du GameObject "3" à "MasculineAvatar"
-                    Animator objetParentAnimator = objetParent.GetComponent<Animator>();
-                    if (objetParentAnimator != null && MasculineAvatar != null)
-                    {
-                        objetParentAnimator.avatar = MasculineAvatar;
-                    }
-                    else
-                    {
-                        Debug.LogError("Le GameObject '3' n'a pas de composant Animator ou 'MasculineAvatar' est null.");
-                    }
+                // Instancier le personnage choisi ou le personnage par défaut
+                if (indexChoisi >= 0 && indexChoisi < prefabsPersonnages.Length)
+                {
+                    GameObject prefabPersonnageChoisi = prefabsPersonnages[indexChoisi];
+                    instancePersonnage = Instantiate(prefabPersonnageChoisi, objetParent.transform);
+
+                    // Remplacer l'avatar selon le personnage choisi
+                    RemplacerAvatar(prefabPersonnageChoisi.name);
                 }
                 else
                 {
-                    Debug.LogError("Le GameObject instancié n'a pas de composant Animator.");
+                    instancePersonnage = Instantiate(personnageParDefaut, objetParent.transform);
+                    Debug.LogWarning("Index de personnage invalide : " + indexChoisi + ". Le personnage par défaut a été instancié.");
+
+                    // Assigner un avatar par défaut
+                    if (DefaultAvatar != null)
+                    {
+                        animatorParent.avatar = DefaultAvatar;
+                        Debug.Log("Avatar par défaut assigné avec succès.");
+                    }
+                    else
+                    {
+                        Debug.LogError("DefaultAvatar est null. Vérifiez son assignation dans l'Inspecteur.");
+                    }
                 }
             }
             else
             {
-                instancePersonnage = Instantiate(personnageParDefaut, objetParent.transform);
-                instancePersonnage.transform.parent = objetParent.transform;
-                animatorPersonnage = instancePersonnage.GetComponent<Animator>();
-                Debug.LogWarning("Index de personnage invalide : " + indexChoisi + ". Le personnage par défaut a été instancié.");
+                Debug.LogError("Le GameObject '3' n'a pas de composant Animator.");
             }
-
-            VerifierAnimationsPersonnage();
         }
         else
         {
-            Debug.LogError("Le parent '3' est introuvable dans la scène.");
+            Debug.LogError("Le GameObject '3' est introuvable dans la scène.");
         }
     }
 
-    private void VerifierAnimationsPersonnage()
+    private void RemplacerAvatar(string prefabName)
     {
-        if (animatorPersonnage != null)
+        // Vérifier que l'Animator du parent est bien récupéré
+        if (animatorParent != null)
         {
-            AnimatorStateInfo stateInfo = animatorPersonnage.GetCurrentAnimatorStateInfo(0);
-            if (stateInfo.shortNameHash != 0)
+            Debug.Log("Tentative d'assignation de l'avatar pour le préfabriqué : " + prefabName);
+
+            // Assigner l'avatar en fonction du nom du préfabriqué
+            if (prefabName.Contains("Masculin"))
             {
-                animatorPersonnage.applyRootMotion = true;
+                if (MasculineAvatar != null)
+                {
+                    animatorParent.avatar = MasculineAvatar;
+                    Debug.Log("Avatar masculin assigné avec succès.");
+                }
+                else
+                {
+                    Debug.LogError("MasculineAvatar est null. Vérifiez son assignation dans l'Inspecteur.");
+                }
+            }
+            else if (prefabName.Contains("Feminin"))
+            {
+                if (FeminineAvatar != null)
+                {
+                    animatorParent.avatar = FeminineAvatar;
+                    Debug.Log("Avatar féminin assigné avec succès.");
+                }
+                else
+                {
+                    Debug.LogError("FeminineAvatar est null. Vérifiez son assignation dans l'Inspecteur.");
+                }
             }
             else
             {
-                animatorPersonnage.applyRootMotion = false;
+                Debug.LogError("Nom du prefab ne contient pas 'Masculin' ou 'Feminin'. Nom du préfabriqué : " + prefabName);
+            }
+
+            // Vérifier si l'assignation a bien été effectuée
+            if (animatorParent.avatar == null)
+            {
+                Debug.LogError("L'avatar reste vide après tentative d'assignation.");
             }
         }
         else
         {
-            Debug.LogError("Animator du personnage instancié est null.");
+            Debug.LogError("L'Animator du parent '3' est null.");
         }
     }
 }

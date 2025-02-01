@@ -182,19 +182,59 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4356434219819137567, guid: fc553c746ab13cc41a339da65052ba99,
         type: 3}
+      propertyPath: DefaultAvatar
+      value: 
+      objectReference: {fileID: 9000000, guid: 135b456f38897dd40a0dcf22218087bb, type: 3}
+    - target: {fileID: 4356434219819137567, guid: fc553c746ab13cc41a339da65052ba99,
+        type: 3}
       propertyPath: FeminineAvatar
       value: 
-      objectReference: {fileID: 9000000, guid: 89f358deabe746242a74281b3ca72caf, type: 3}
+      objectReference: {fileID: 9000000, guid: 135b456f38897dd40a0dcf22218087bb, type: 3}
     - target: {fileID: 4356434219819137567, guid: fc553c746ab13cc41a339da65052ba99,
         type: 3}
       propertyPath: MasculineAvatar
       value: 
-      objectReference: {fileID: 9000000, guid: 670b799dda2e9c84d930a9788ac0f2ec, type: 3}
+      objectReference: {fileID: 9000000, guid: 89f358deabe746242a74281b3ca72caf, type: 3}
+    - target: {fileID: 4356434219819137567, guid: fc553c746ab13cc41a339da65052ba99,
+        type: 3}
+      propertyPath: personnageParDefaut
+      value: 
+      objectReference: {fileID: 2576853351999354212, guid: 6a18642f94fcd32498de45b0d4e05d59,
+        type: 3}
+    - target: {fileID: 4356434219819137567, guid: fc553c746ab13cc41a339da65052ba99,
+        type: 3}
+      propertyPath: prefabsPersonnages.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356434219819137567, guid: fc553c746ab13cc41a339da65052ba99,
+        type: 3}
+      propertyPath: 'prefabsPersonnages.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2576853351999354212, guid: 6a18642f94fcd32498de45b0d4e05d59,
+        type: 3}
     - target: {fileID: 4356434219819137567, guid: fc553c746ab13cc41a339da65052ba99,
         type: 3}
       propertyPath: 'prefabsPersonnages.Array.data[1]'
       value: 
-      objectReference: {fileID: 4531211424887195479, guid: d8af0d0736924e8449d86a6b19397f27,
+      objectReference: {fileID: 4462889142594292231, guid: 6074d2715733eb64c8a4f2d85c13651f,
+        type: 3}
+    - target: {fileID: 4356434219819137567, guid: fc553c746ab13cc41a339da65052ba99,
+        type: 3}
+      propertyPath: 'prefabsPersonnages.Array.data[2]'
+      value: 
+      objectReference: {fileID: 216093766039772959, guid: 1bb35fa230e3e2e4aad3e92e464d4cb7,
+        type: 3}
+    - target: {fileID: 4356434219819137567, guid: fc553c746ab13cc41a339da65052ba99,
+        type: 3}
+      propertyPath: 'prefabsPersonnages.Array.data[3]'
+      value: 
+      objectReference: {fileID: 1501949900791707277, guid: 49b6d40e1e37a6d468821f5640af9c6f,
+        type: 3}
+    - target: {fileID: 4356434219819137567, guid: fc553c746ab13cc41a339da65052ba99,
+        type: 3}
+      propertyPath: 'prefabsPersonnages.Array.data[4]'
+      value: 
+      objectReference: {fileID: 648290403180164602, guid: 7d55b5228f0310a4b93671ce1f1f155b,
         type: 3}
     - target: {fileID: 7672062145671634456, guid: fc553c746ab13cc41a339da65052ba99,
         type: 3}
@@ -1264,7 +1304,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Avatar
       value: 
-      objectReference: {fileID: 9000000, guid: 135b456f38897dd40a0dcf22218087bb, type: 3}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: -8931752922357585426, guid: fd9cfc7de4d779347b050f621fb8a2f5, type: 3}
